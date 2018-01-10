@@ -21,6 +21,7 @@ namespace alexaBullying
         bool practice1Started = false;
         bool practice2Started = false;
         bool practice3Started = false;
+        int followUp = 0;
 
         public SkillResponse FunctionHandler(SkillRequest input, ILambdaContext context)
         {
@@ -41,6 +42,12 @@ namespace alexaBullying
                     "the number one guide for standing up to bullies effectively. " +
                     "I will simulate a bully and help you practice the best ways to respond. " +
                     "Say continue to begin learning.";
+                phrase = "";
+                introStatus = false;
+                practice1Started = false;
+                practice2Started = false;
+                practice3Started = false;
+                followUp = 0;
 
             }
             else if (input.GetRequestType() == typeof(IntentRequest))
@@ -60,6 +67,11 @@ namespace alexaBullying
                             log.LogLine($"AMAZON.StopIntent: send StopMessage");
                             innerResponse = new PlainTextOutputSpeech();
                             (innerResponse as PlainTextOutputSpeech).Text = "Goodbye!";
+                            introStatus = false;
+                            practice1Started = false;
+                            practice2Started = false;
+                            practice3Started = false;
+                            followUp = 0;
                             response.Response.ShouldEndSession = true;
                             break;
                         case "AMAZON.HelpIntent":
@@ -86,71 +98,104 @@ namespace alexaBullying
                 }
                 else if (practice1Started == false && practice2Started == false && practice3Started == false && introStatus == true)
                 {
-                    switch (intentRequest.Intent.Name)
+                    if (followUp == 0)
                     {
-                        case "AMAZON.CancelIntent":
-                            log.LogLine($"AMAZON.CancelIntent: send StopMessage");
-                            innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "Goodbye!";
-                            response.Response.ShouldEndSession = true;
-                            break;
-                        case "StopIntent":
-                            log.LogLine($"AMAZON.StopIntent: send StopMessage");
-                            innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "Goodbye!";
-                            response.Response.ShouldEndSession = true;
-                            break;
-                        case "AMAZON.HelpIntent":
-                            log.LogLine($"AMAZON.HelpIntent: send HelpMessage");
-                            innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "add later";
-                            break;
-                        case "YesIntent":
-                            log.LogLine($"Answer Yes");
-                            innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "Here we go. 3! 2! 1! Hey, dummy";
-                            practice1Started = true;
-                            break;
-                        case "NoIntent":
-                            log.LogLine($"Answer no");
-                            innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "If you would like to hear the phrases again say repeat. If you are done" +
-                                " standing up to bullying then say exit or stop";
-                            practice1Started = false;
-                            break;
-                        case "RepeatIntent":
-                            log.LogLine($"phrases repeated");
-                            innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "Option 1, talk to the hand.  Option 2, Wow! Now I know why " +
-                                "everyone says that stuff about you.  Option 3, Do you think you could star in the next Mean Girls movie?" +
-                                "  Which phrase would you like to practice?  Please say its number or the pharse back now, or say repeat" +
-                                " to hear them again.";
-                            break;
-                        case "OpOneIntent":
-                            log.LogLine($"phrase 1 choosen");
-                            innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "You have chosen, talk to the hand. Are you ready to practice?";
-                            phrase = "talk to the hand";
-                            break;
-                        case "OpTwoIntent":
-                            log.LogLine($"phrase 2 choosen");
-                            innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "You have chosen, Wow! Now I know why " +
-                                "everyone says that stuff about you. Are you ready to practice?";
-                            phrase = "Wow! Now I know why everyone says that stuff about you.";
-                            break;
-                        case "OpThreeIntent":
-                            log.LogLine($"phrase 3 choosen");
-                            innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "You have chosen, Do you think you could star in the next" +
-                                " Mean Girls movie?. Are you ready to practice?";
-                            phrase = "Do you think you could star in the next Mean Girls movie?";
-                            break;
-                        default:
-                            log.LogLine($"Unknown intent: " + intentRequest.Intent.Name);
-                            innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "Unknown, remember to add later";
-                            break;
+                        switch (intentRequest.Intent.Name)
+                        {
+                            case "AMAZON.CancelIntent":
+                                log.LogLine($"AMAZON.CancelIntent: send StopMessage");
+                                innerResponse = new PlainTextOutputSpeech();
+                                (innerResponse as PlainTextOutputSpeech).Text = "Goodbye!";
+                                response.Response.ShouldEndSession = true;
+                                break;
+                            case "StopIntent":
+                                log.LogLine($"AMAZON.StopIntent: send StopMessage");
+                                innerResponse = new PlainTextOutputSpeech();
+                                (innerResponse as PlainTextOutputSpeech).Text = "Goodbye!";
+                                introStatus = false;
+                                practice1Started = false;
+                                practice2Started = false;
+                                practice3Started = false;
+                                followUp = 0;
+                                response.Response.ShouldEndSession = true;
+                                break;
+                            case "AMAZON.HelpIntent":
+                                log.LogLine($"AMAZON.HelpIntent: send HelpMessage");
+                                innerResponse = new PlainTextOutputSpeech();
+                                (innerResponse as PlainTextOutputSpeech).Text = "add later";
+                                break;
+                            case "RepeatIntent":
+                                log.LogLine($"phrases repeated");
+                                innerResponse = new PlainTextOutputSpeech();
+                                (innerResponse as PlainTextOutputSpeech).Text = "Option 1, talk to the hand.  Option 2, Wow! Now I know why " +
+                                    "everyone says that stuff about you.  Option 3, Do you think you could star in the next Mean Girls movie?!" +
+                                    "  Which phrase would you like to practice?";
+                                break;
+                            case "OpOneIntent":
+                                log.LogLine($"phrase 1 choosen");
+                                innerResponse = new PlainTextOutputSpeech();
+                                (innerResponse as PlainTextOutputSpeech).Text = "You have chosen, talk to the hand. Are you ready to practice?";
+                                phrase = "talk to the hand";
+                                followUp++;
+                                break;
+                            case "OpTwoIntent":
+                                log.LogLine($"phrase 2 choosen");
+                                innerResponse = new PlainTextOutputSpeech();
+                                (innerResponse as PlainTextOutputSpeech).Text = "You have chosen, Wow! Now I know why " +
+                                    "everyone says that stuff about you. Are you ready to practice?";
+                                phrase = "Wow! Now I know why everyone says that stuff about you.";
+                                followUp++;
+                                break;
+                            case "OpThreeIntent":
+                                log.LogLine($"phrase 3 choosen");
+                                innerResponse = new PlainTextOutputSpeech();
+                                (innerResponse as PlainTextOutputSpeech).Text = "You have chosen, Do you think you could star in the next" +
+                                    " Mean Girls movie?. Are you ready to practice?";
+                                phrase = "Do you think you could star in the next Mean Girls movie?";
+                                followUp++;
+                                break;
+                            default:
+                                log.LogLine($"Unknown intent: " + intentRequest.Intent.Name);
+                                innerResponse = new PlainTextOutputSpeech();
+                                (innerResponse as PlainTextOutputSpeech).Text = "Unknown, remember to add later";
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (intentRequest.Intent.Name)
+                        {
+                            case "YesIntent":
+                                log.LogLine($"Answer Yes");
+                                innerResponse = new PlainTextOutputSpeech();
+                                (innerResponse as PlainTextOutputSpeech).Text = "Here we go. 3! 2! 1! Hey, dummy";
+                                practice1Started = true;
+                                break;
+                            case "NoIntent":
+                                log.LogLine($"Answer no");
+                                innerResponse = new PlainTextOutputSpeech();
+                                (innerResponse as PlainTextOutputSpeech).Text = "If you would like to hear the phrases again say repeat. If you are done" +
+                                    " standing up to bullying then say exit or stop";
+                                followUp = 0;
+                                practice1Started = false;
+                                break;
+                            case "StopIntent":
+                                log.LogLine($"AMAZON.StopIntent: send StopMessage");
+                                innerResponse = new PlainTextOutputSpeech();
+                                (innerResponse as PlainTextOutputSpeech).Text = "Goodbye!";
+                                introStatus = false;
+                                practice1Started = false;
+                                practice2Started = false;
+                                practice3Started = false;
+                                followUp = 0;
+                                response.Response.ShouldEndSession = true;
+                                break;
+                            default:
+                                log.LogLine($"Unknown intent: " + intentRequest.Intent.Name);
+                                innerResponse = new PlainTextOutputSpeech();
+                                (innerResponse as PlainTextOutputSpeech).Text = "Please answer yes or no";
+                                break;
+                        }
                     }
                 }
                 else if (practice1Started == true)
@@ -167,18 +212,24 @@ namespace alexaBullying
                             log.LogLine($"AMAZON.StopIntent: send StopMessage");
                             innerResponse = new PlainTextOutputSpeech();
                             (innerResponse as PlainTextOutputSpeech).Text = "Goodbye!";
+                            introStatus = false;
+                            practice1Started = false;
+                            practice2Started = false;
+                            practice3Started = false;
+                            followUp = 0;
                             response.Response.ShouldEndSession = true;
                             break;
                         case "AMAZON.HelpIntent":
                             log.LogLine($"AMAZON.HelpIntent: send HelpMessage");
                             innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "The comeback you choose was " + phrase;
+                            (innerResponse as PlainTextOutputSpeech).Text = "The comeback you chose was " + phrase + "  " +
+                                "Lets try again! 3! 2! 1! Hey, dummy";
                             break;
                         case "OpOneIntent":
                             log.LogLine($"phrase 1 choosen");
                             innerResponse = new PlainTextOutputSpeech();
                             (innerResponse as PlainTextOutputSpeech).Text = "Good job. Let's try it again.  Remember" +
-                                " to speak calmly with a hint of sarcasm. 3! 2! 1! Hey, dummy";
+                                    " to speak calmly with a hint of sarcasm. 3! 2! 1! Hey, dummy";
                             practice1Started = false;
                             practice2Started = true;
                             break;
@@ -201,7 +252,7 @@ namespace alexaBullying
                         default:
                             log.LogLine($"Unknown intent: " + intentRequest.Intent.Name);
                             innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "Good try listen to the phrase again, " + phrase;
+                            (innerResponse as PlainTextOutputSpeech).Text = "Good try! Listen to the phrase again, " + phrase;
                             break;
                     }
                 }
@@ -219,12 +270,18 @@ namespace alexaBullying
                             log.LogLine($"AMAZON.StopIntent: send StopMessage");
                             innerResponse = new PlainTextOutputSpeech();
                             (innerResponse as PlainTextOutputSpeech).Text = "Goodbye!";
+                            introStatus = false;
+                            practice1Started = false;
+                            practice2Started = false;
+                            practice3Started = false;
+                            followUp = 0;
                             response.Response.ShouldEndSession = true;
                             break;
                         case "AMAZON.HelpIntent":
                             log.LogLine($"AMAZON.HelpIntent: send HelpMessage");
                             innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "The comeback you choose was " + phrase;
+                            (innerResponse as PlainTextOutputSpeech).Text = "The comeback you chose was " + phrase + "  " +
+                                "Lets try again! 3! 2! 1! Hey, dummy";
                             break;
                         case "OpOneIntent":
                             log.LogLine($"phrase 1 choosen");
@@ -256,7 +313,7 @@ namespace alexaBullying
                         default:
                             log.LogLine($"Unknown intent: " + intentRequest.Intent.Name);
                             innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "Good try listen to the phrase again, " + phrase;
+                            (innerResponse as PlainTextOutputSpeech).Text = "Good try! Listen to the phrase again, " + phrase;
                             break;
                     }
                 }
@@ -274,12 +331,18 @@ namespace alexaBullying
                             log.LogLine($"AMAZON.StopIntent: send StopMessage");
                             innerResponse = new PlainTextOutputSpeech();
                             (innerResponse as PlainTextOutputSpeech).Text = "Goodbye!";
+                            introStatus = false;
+                            practice1Started = false;
+                            practice2Started = false;
+                            practice3Started = false;
+                            followUp = 0;
                             response.Response.ShouldEndSession = true;
                             break;
                         case "AMAZON.HelpIntent":
                             log.LogLine($"AMAZON.HelpIntent: send HelpMessage");
                             innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "The comeback you choose was " + phrase;
+                            (innerResponse as PlainTextOutputSpeech).Text = "The comeback you chose was " + phrase + "  " +
+                                "Lets try again! 3! 2! 1! Hey, dummy";
                             break;
                         case "OpOneIntent":
                             log.LogLine($"phrase 1 choosen");
@@ -311,13 +374,17 @@ namespace alexaBullying
                             innerResponse = new PlainTextOutputSpeech();
                             (innerResponse as PlainTextOutputSpeech).Text = "Thanks for using Comforting Comebacks. Be sure" +
                                 " to play every week for new phrases and techniques.  Goodbye!";
-                            practice3Started = false;
                             introStatus = false;
+                            practice1Started = false;
+                            practice2Started = false;
+                            practice3Started = false;
+                            followUp = 0;
+                            response.Response.ShouldEndSession = true;
                             break;
                         default:
                             log.LogLine($"Unknown intent: " + intentRequest.Intent.Name);
                             innerResponse = new PlainTextOutputSpeech();
-                            (innerResponse as PlainTextOutputSpeech).Text = "Good try listen to the phrase again, " + phrase;
+                            (innerResponse as PlainTextOutputSpeech).Text = "Good try! Listen to the phrase again, " + phrase;
                             break;
                     }
                 }
